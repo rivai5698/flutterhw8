@@ -7,6 +7,8 @@ class CategoryCubit extends Cubit<CategoryState>{
   List<it.Item> items = [];
   List<it.Item> cart = [];
 
+
+
   getItem(List<it.Item> lists){
     items.clear();
     items.addAll(lists);
@@ -59,14 +61,18 @@ class CategoryCubit extends Cubit<CategoryState>{
       for(int i=0;i<cart.length;i++){
         cart.removeWhere((element) => element.id == item.id);
       }
-      for(int i=0;i<items.length;i++){
-        for(int j=0;j<cart.length;j++){
-          if(items[i]==cart[j]){
-            items[i].isAdd = false;
+
+      for (it.Item item in items){
+          if(!cart.contains(item)){
+              item.isAdd = false;
           }
-        }
       }
+
+      print('After remove: $items');
       emit(CategoryGetSuccessState());
+      if(cart.isEmpty||cart.length==0){
+        emit(CategoryEmptyState());
+      }
 
     }else{
       emit(CategoryEmptyState());

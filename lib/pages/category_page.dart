@@ -8,9 +8,8 @@ import '../model/item.dart' as it;
 
 class CategoryPage extends StatefulWidget {
   final List<it.Item> items;
-
-  const CategoryPage({super.key, required this.items});
-
+  final List<it.Item> cart;
+  const CategoryPage({super.key, required this.items, required this.cart});
 
   @override
   State<CategoryPage> createState() => _CategoryPageState();
@@ -24,35 +23,43 @@ class _CategoryPageState extends State<CategoryPage> {
   void initState() {
     // TODO: implement initState
     //items.addAll(it.items);
+    print('Catepage: ${widget.items}');
+    _categoryCubit.getItemCart(widget.cart);
     _categoryCubit.getItem(widget.items);
     super.initState();
   }
-  // @override
-  // void setState(VoidCallback fn) {
-  //   _categoryCubit.getItem(widget.items);
-  //   // TODO: implement setState
-  //   super.setState(fn);
-  // }
+
+  @override
+  void setState(VoidCallback fn) {
+    _categoryCubit.getItem(widget.items);
+    // TODO: implement setState
+    super.setState(fn);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          BlocBuilder<CategoryCubit,CategoryState>(
-            bloc: _categoryCubit,
-            builder: (ctx,state){
-              return IconButton(
-                icon: const Icon(Icons.shopping_cart),
-                onPressed: () {
-                  //
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (ctx) => CartPage(cart: _categoryCubit.cart,items: widget.items,)));
-                  //_categoryCubit.getItemCart();
-                },
-              );
-      }
-          ),
+          BlocBuilder<CategoryCubit, CategoryState>(
+              bloc: _categoryCubit,
+              builder: (ctx, state) {
+                return cart(_categoryCubit.cart.length, _categoryCubit.cart.isNotEmpty);
+                //   IconButton(
+                //   icon: const Icon(Icons.shopping_cart),
+                //   onPressed: () {
+                //     //
+                //     Navigator.push(
+                //         context,
+                //         MaterialPageRoute(
+                //             builder: (ctx) => CartPage(
+                //                   cart: _categoryCubit.cart,
+                //                   items: widget.items,
+                //                 )));
+                //     //_categoryCubit.getItemCart();
+                //   },
+                // );
+              }),
         ],
       ),
       body: BlocBuilder<CategoryCubit, CategoryState>(
@@ -97,22 +104,39 @@ class _CategoryPageState extends State<CategoryPage> {
       hasItems = true;
     }
     return GestureDetector(
-      child: Stack(
-        children: [
-          Visibility(
-            visible: hasItems,
-            child: Positioned(
-                child: Text(
-              '$total',
-              style: const TextStyle(color: Colors.red),
+      onTap: (){
+        Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (ctx) => CartPage(
+                              cart: _categoryCubit.cart,
+                              items: widget.items,
+                            )));
+                //_categoryCubit.getItemCart();
+      },
+      child: SizedBox(
+        height: 60,
+        width: 60,
+        child: Stack(
+          children: [
+
+            const Positioned.fill(
+                child: Icon(
+              Icons.shopping_cart,
+              color: Colors.white,
             )),
-          ),
-          const Positioned.fill(
-              child: Icon(
-            Icons.shopping_cart,
-            color: Colors.white,
-          )),
-        ],
+            Visibility(
+              visible: hasItems,
+              child: Positioned(
+                  right: 15,
+                  top: 5,
+                  child: Text(
+                    '$total',
+                    style: const TextStyle(color: Colors.red,fontSize: 22,fontWeight: FontWeight.bold),
+                  )),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -160,7 +184,7 @@ class _CategoryPageState extends State<CategoryPage> {
                       visible: !vis,
                       child: Positioned(
                         child: GestureDetector(
-                          onTap: (){
+                          onTap: () {
                             _categoryCubit.addCartItems(item);
                           },
                           child: const Text(
@@ -178,70 +202,5 @@ class _CategoryPageState extends State<CategoryPage> {
         ],
       ),
     );
-    //   BlocBuilder<CategoryCubit,CategoryState>(
-    //   bloc: _categoryCubit,
-    //   builder: (ctx,state){
-    //     return Container(
-    //       width: double.infinity,
-    //       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-    //       height: 80,
-    //       child: Row(
-    //         children: [
-    //           Container(
-    //             height: 80,
-    //             width: 80,
-    //             color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
-    //           ),
-    //           const SizedBox(
-    //             width: 10,
-    //           ),
-    //           Text(
-    //             '${item.name}',
-    //             style: const TextStyle(
-    //               color: Colors.black45,
-    //               fontSize: 18,
-    //             ),
-    //           ),
-    //           Expanded(
-    //             child: Align(
-    //               alignment: Alignment.centerRight,
-    //               child: GestureDetector(
-    //                 onTap: (){
-    //                   _categoryCubit.addCartItems(item);
-    //                 },
-    //                 child: SizedBox(
-    //                   width: 80,
-    //                   height: 80,
-    //                   child: Stack(
-    //                     alignment: Alignment.center,
-    //                     children:  [
-    //                       Visibility(
-    //                           visible: vis!,
-    //                           child: const Positioned(
-    //                             child: Icon(
-    //                               Icons.check,
-    //                               color: Colors.grey,
-    //                             ),
-    //                           )),
-    //                       Visibility(
-    //                         visible: !vis,
-    //                         child: const Positioned(
-    //                           child: Text(
-    //                             'Add',
-    //                             style: TextStyle(color: Colors.blue),
-    //                           ),
-    //                         ),
-    //                       ),
-    //                     ],
-    //                   ),
-    //                 ),
-    //               ),
-    //             ),
-    //           ),
-    //         ],
-    //       ),
-    //     );
-    //   }
-    // );
   }
 }

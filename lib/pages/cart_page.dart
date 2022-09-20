@@ -31,8 +31,11 @@ class _CartPageState extends State<CartPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back_ios), onPressed: () {
-          Navigator.pop(context, MaterialPageRoute(builder: (ctx)=> CategoryPage(items: _categoryCubit.items,)));
-          _categoryCubit.getItem(_categoryCubit.items);
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (ctx)=> CategoryPage(items: _categoryCubit.items,cart: _categoryCubit.cart,)));
+          //Navigator.pop(context,false);
+          print('Back items: ${_categoryCubit.items}');
+          print('Back cart: ${_categoryCubit.cart}');
+          //  _categoryCubit.getItem(_categoryCubit.items);
           },),
       ),
       body: Column(
@@ -89,11 +92,17 @@ class _CartPageState extends State<CartPage> {
             height: 1,
           ),
           Expanded(
-            child: Container(
-              width: double.infinity,
-              height: 200,
-              color: Colors.yellow,
-              child: buyItems(_categoryCubit.cart),
+            child: BlocBuilder<CategoryCubit,CategoryState>(
+              bloc: _categoryCubit,
+              builder: (context,state){
+                return Container(
+                width: double.infinity,
+                height: 200,
+                color: Colors.yellow,
+                child: buyItems(_categoryCubit.cart),
+                );
+              },
+
             ),
           )
         ],
