@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterhw8/model/item.dart' as it;
 import 'package:flutterhw8/pages/category_page.dart';
 
 void main() {
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const CategoryPage(),
+      home:  CategoryPage(items: it.items,),
     );
   }
 }

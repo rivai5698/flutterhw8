@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutterhw8/model/item.dart' as it;
 
@@ -6,9 +7,12 @@ class CategoryCubit extends Cubit<CategoryState>{
   List<it.Item> items = [];
   List<it.Item> cart = [];
 
-  getItem(){
-    items.addAll(it.items);
+  getItem(List<it.Item> lists){
+    items.clear();
+    items.addAll(lists);
     emit(CategoryGettingState());
+
+    print('get items: $items');
 
     Future.delayed(const Duration(seconds: 1),(){
       emit(CategoryGetSuccessState());
@@ -37,11 +41,11 @@ class CategoryCubit extends Cubit<CategoryState>{
   }
 
 
-  getItemCart(){
-    //cart.addAll(cart);
+  getItemCart(List<it.Item> items){
+    cart.addAll(items);
     emit(CategoryCartGetState());
     print('get cart: $cart');
-    Future.delayed(const Duration(seconds: 3),(){
+    Future.delayed(const Duration(seconds: 1),(){
       if(cart.isNotEmpty){
         emit(CategoryCartSuccessState());
       }else{
@@ -54,7 +58,6 @@ class CategoryCubit extends Cubit<CategoryState>{
     if(cart.isNotEmpty){
       for(int i=0;i<cart.length;i++){
         cart.removeWhere((element) => element.id == item.id);
-        emit(CategoryRemoveState());
       }
       for(int i=0;i<items.length;i++){
         for(int j=0;j<cart.length;j++){
@@ -63,6 +66,8 @@ class CategoryCubit extends Cubit<CategoryState>{
           }
         }
       }
+      emit(CategoryGetSuccessState());
+
     }else{
       emit(CategoryEmptyState());
     }

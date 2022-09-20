@@ -7,43 +7,51 @@ import 'package:flutterhw8/pages/cart_page.dart';
 import '../model/item.dart' as it;
 
 class CategoryPage extends StatefulWidget {
-  const CategoryPage({Key? key}) : super(key: key);
+  final List<it.Item> items;
+
+  const CategoryPage({super.key, required this.items});
+
 
   @override
   State<CategoryPage> createState() => _CategoryPageState();
 }
 
 class _CategoryPageState extends State<CategoryPage> {
-  final List<it.Item> items = [];
+  //final List<it.Item> items = [];
   final CategoryCubit _categoryCubit = CategoryCubit();
 
   @override
   void initState() {
     // TODO: implement initState
     //items.addAll(it.items);
-    _categoryCubit.getItem();
+    _categoryCubit.getItem(widget.items);
     super.initState();
   }
-  @override
-  void setState(VoidCallback fn) {
-    _categoryCubit.getItem();
-    // TODO: implement setState
-    super.setState(fn);
-  }
+  // @override
+  // void setState(VoidCallback fn) {
+  //   _categoryCubit.getItem(widget.items);
+  //   // TODO: implement setState
+  //   super.setState(fn);
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              //
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (ctx) => const CartPage()));
-              //_categoryCubit.getItemCart();
-            },
+          BlocBuilder<CategoryCubit,CategoryState>(
+            bloc: _categoryCubit,
+            builder: (ctx,state){
+              return IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  //
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (ctx) => CartPage(cart: _categoryCubit.cart,items: widget.items,)));
+                  //_categoryCubit.getItemCart();
+                },
+              );
+      }
           ),
         ],
       ),
@@ -134,35 +142,35 @@ class _CategoryPageState extends State<CategoryPage> {
           Expanded(
             child: Align(
               alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: () {
-                  _categoryCubit.addCartItems(item);
-                },
-                child: SizedBox(
-                  width: 80,
-                  height: 80,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Visibility(
-                          visible: vis!,
-                          child: const Positioned(
-                            child: Icon(
-                              Icons.check,
-                              color: Colors.grey,
-                            ),
-                          )),
-                      Visibility(
-                        visible: !vis,
+              child: SizedBox(
+                width: 80,
+                height: 80,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Visibility(
+                        visible: vis!,
                         child: const Positioned(
-                          child: Text(
+                          child: Icon(
+                            Icons.check,
+                            color: Colors.grey,
+                          ),
+                        )),
+                    Visibility(
+                      visible: !vis,
+                      child: Positioned(
+                        child: GestureDetector(
+                          onTap: (){
+                            _categoryCubit.addCartItems(item);
+                          },
+                          child: const Text(
                             'Add',
                             style: TextStyle(color: Colors.blue),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),

@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutterhw8/category_bloc/category_bloc.dart';
 import 'package:flutterhw8/model/item.dart' as it;
 import 'package:flutterhw8/pages/category_page.dart';
 
 class CartPage extends StatefulWidget {
-  const CartPage({Key? key}) : super(key: key);
+  final List<it.Item> cart;
+  final List<it.Item> items;
+  const CartPage({super.key, required this.cart, required this.items});
+  //const CartPage({Key? key}) : super(key: key);
 
   @override
   State<CartPage> createState() => _CartPageState();
 }
 
 class _CartPageState extends State<CartPage> {
-  //List<it.Item> cart = [];
   final CategoryCubit _categoryCubit =CategoryCubit();
   @override
   void initState() {
-    //print('Cart: $cart');
-    _categoryCubit.getItemCart();
+    _categoryCubit.getItemCart(widget.cart);
+    _categoryCubit.getItem(widget.items);
     // TODO: implement initState
     super.initState();
   }
@@ -30,8 +31,8 @@ class _CartPageState extends State<CartPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back_ios), onPressed: () {
-          Navigator.pop(context, MaterialPageRoute(builder: (ctx)=>const CategoryPage()));
-          _categoryCubit.getItem();
+          Navigator.pop(context, MaterialPageRoute(builder: (ctx)=> CategoryPage(items: _categoryCubit.items,)));
+          _categoryCubit.getItem(_categoryCubit.items);
           },),
       ),
       body: Column(
@@ -40,7 +41,7 @@ class _CartPageState extends State<CartPage> {
             bloc: _categoryCubit,
             builder: (ctx, state){
               print('State: $state');
-              if(state is CategoryCartGetState){
+              if(state is CategoryGettingState){
                 return Container(
                   width: double.infinity,
                   height: heightM,
@@ -50,7 +51,7 @@ class _CartPageState extends State<CartPage> {
                   ),
                 );
               }
-              if(state is CategoryCartSuccessState){
+              if(state is CategoryGetSuccessState){
                 return Container(
                   width: double.infinity,
                   height: heightM,
@@ -64,18 +65,18 @@ class _CartPageState extends State<CartPage> {
                   ),
                 );
               }
-              // if(_categoryCubit.cart.isEmpty){
-              //   return Container(
-              //     width: double.infinity,
-              //     height: heightM,
-              //     color: Colors.yellow,
-              //     child: const Center(
-              //       child: Text(
-              //         'Empty'
-              //       ),
-              //     )
-              //   );
-              // }
+              if(_categoryCubit.cart.isEmpty){
+                return Container(
+                  width: double.infinity,
+                  height: heightM,
+                  color: Colors.yellow,
+                  child: const Center(
+                    child: Text(
+                      'Empty'
+                    ),
+                  )
+                );
+              }
               return Container(
 
               );
@@ -118,7 +119,7 @@ class _CartPageState extends State<CartPage> {
     return Container(
       height: 80,
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       child: Row(
         children: [
           const Icon(
@@ -140,6 +141,9 @@ class _CartPageState extends State<CartPage> {
             child: Align(
               alignment: Alignment.centerRight,
               child: GestureDetector(
+                onTap: (){
+                    _categoryCubit.removeCartItems(item);
+                },
                 child: const Icon(
                   Icons.remove_circle,
                   color: Colors.black45,
